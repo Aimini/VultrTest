@@ -5,26 +5,27 @@
 #  - main: test the best vultr server, include client-server ping\ server-client ping\ client download speed from server
 #
 
-import io
-import sys
-import chardet
-
-import urllib
 import http.cookiejar
+import io
+import os
+import pathlib
+import sys
+import urllib
 from urllib.request import OpenerDirector
 
 import bs4
+import chardet
 
 # where can you get the server's list
+from vultr.Node import Node
+
 vultrServerUrl = "https://www.vultr.com/faq/"
 # servers Node list , name and Url
 vultrServerNodes = []
 # vultr test score
 vultrserversScore = {}
 
-
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer,encoding='gb18030')
-
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
 
 default_headers = {
     "Connection": "keep-alive",
@@ -60,8 +61,37 @@ def as_text(data):
     return raw_text.decode(encoding=charencode['encoding'])
 
 
-opener = make_opener()
-html_text = as_text(opener.open("https://www.vultr.com/faq/"))
+def getServerNodeListSoup(useLocalCache=False):
+    # BeautifulSoup can't process the file-like object,
+    #  so you do not need to read string form file to buffer
+    if useLocalCache:
+        html_text = open(pathlib.Path(r"../cache/Vultr.com.html"))
+    else:
+        opener = make_opener()
+        html_text = opener.open("https://www.vultr.com/faq/")
+    soup = bs4.BeautifulSoup(html_text, 'lxml')
+    return soup
 
 
-# TODO: get server's link
+soup = getServerNodeListSoup(True)
+# each row meaing one server
+tr_servers = soup.select("#speedtest_v4 tr")
+for one_tr in tr_servers:
+    tds = one_tr.find_all("td")
+    # the seconde td is server node's url
+    try:
+
+        name = tds[0].get_text().strip()
+        address = ""
+        if tds[1].a is not None:
+            address = tds[1].a['href']
+            vultrServerNodes.append(Node(name, address))
+    except TypeError as e:
+        print("catch a TypeError,maybe server {0} will coming soon.")
+        print(e)
+        pass
+
+print("server numbers:"+str(len(vultrServerNodes)))
+print(vultrServerNodes)
+
+
