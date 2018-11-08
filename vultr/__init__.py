@@ -12,10 +12,6 @@ import ipaddress as ipadd
 from urllib.parse import urlparse
 
 
-
-
-
-
 def ping(host: str, count: int = 4):
     """
     sending a ICMP Echo Request to the host with "count" times
@@ -25,7 +21,7 @@ def ping(host: str, count: int = 4):
     :return a dict with key tow key {"package","delay"} that inclucde package info and delay info
         { "package": list() , "delay": list()}
         and The meaning of the package info list's elements is as follows:
-        [sent, received, lost, lost_rate]
+        [sent, received, loss, loss_rate]
         and delay list:
         [minimum, maximum, average]
     """
@@ -41,15 +37,23 @@ def ping(host: str, count: int = 4):
         PLP = re.search(r"Packets: Sent = (\S+), Received = (\S+), Lost = (\S+) \((\S+)% loss\)", out)
         DELAY = re.search(r"Minimum = (\S+)ms, Maximum = (\S+)ms, Average = (\S+)ms", out)
         # if PLP and DELAY:
-        node_data = {
-            "package": [PLP.group(1), PLP.group(2), PLP.group(3), PLP.group(4)],
-            "delay": [DELAY.group(1), DELAY.group(2), DELAY.group(3)]}
+        node_data = {"package": [PLP.group(1), PLP.group(2), PLP.group(3), PLP.group(4)]}
+
+        #if all package loss , DELAY will be None, so set delay info list's elements to -1
+        if DELAY is not None:
+            node_data["delay"] = [DELAY.group(1), DELAY.group(2), DELAY.group(3)]
+        else:
+            node_data["delay"] = [-1, -1, -1]
+            # covert result(string) to number
+            for v in node_data.values():
+                for i in range(len(v)):
+                    v[i] = int(v[i])
 
         return node_data
 
 
 class PingThread(threading.Thread):
-    def __init__(self, serverNode, count=50):
+    def __init__(self, serverNode, count=4):
         threading.Thread.__init__(self)
         self.serverNode = serverNode
         self.count = count
@@ -58,7 +62,6 @@ class PingThread(threading.Thread):
     def run(self):
         print("ping server {}:".format(self.serverNode))
         self.result = ping(self.serverNode.url, self.count)
-
 
 
 def publicIP():

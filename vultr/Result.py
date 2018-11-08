@@ -14,11 +14,11 @@ class Result:
         self.CS_delay_max = delay_max
         self.CS_delay_avg = delay_avg
 
-    def setCSPackage(self,sent,received,lost,lost_rate):
-        self.sent = sent
-        self.received = received
-        self.lost = lost
-        self.lost_rate = lost_rate
+    def setCSPackage(self, sent, received, loss, loss_rate):
+        self.CS_sent = sent
+        self.CS_received = received
+        self.CS_loss = loss
+        self.CS_loss_rate = loss_rate
 
 
     def setSCDelay(self, delay_min, delay_max, delay_avg):
@@ -32,11 +32,11 @@ class Result:
         self.SC_delay_max = delay_max
         self.SC_delay_avg = delay_avg
 
-    def setSCPackage(self,sent,received,lost,lost_rate):
-        self.sent = sent
-        self.received = received
-        self.lost = lost
-        self.lost_rate = lost_rate
+    def setSCPackage(self,sent,received,loss,loss_rate):
+        self.SC_sent = sent
+        self.SC_received = received
+        self.SC_loss = loss
+        self.SC_loss_rate = loss_rate
 
 
     def setSpeed(self, speed_max, speed_avg):
@@ -46,3 +46,6 @@ class Result:
         """
         self.speed_max = speed_max
         self.speed_avg = speed_avg
+
+    def __repr__(self):
+        return str(vars(self))
