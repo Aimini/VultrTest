@@ -3,15 +3,17 @@
 # Author: AI
 
 import re
+import chardet
 import subprocess as sbp
 import sys
+import threading
 import urllib.request
 import ipaddress as ipadd
 from urllib.parse import urlparse
 
-from urllib.request import Request
 
-import chardet
+
+
 
 
 def ping(host: str, count: int = 4):
@@ -44,6 +46,19 @@ def ping(host: str, count: int = 4):
             "delay": [DELAY.group(1), DELAY.group(2), DELAY.group(3)]}
 
         return node_data
+
+
+class PingThread(threading.Thread):
+    def __init__(self, serverNode, count=50):
+        threading.Thread.__init__(self)
+        self.serverNode = serverNode
+        self.count = count
+        self.result = {}
+
+    def run(self):
+        print("ping server {}:".format(self.serverNode))
+        self.result = ping(self.serverNode.url, self.count)
+
 
 
 def publicIP():

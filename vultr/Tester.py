@@ -7,25 +7,24 @@
 
 import http.cookiejar
 import io
-import os
 import pathlib
 import sys
 import urllib
+import winsound
 from urllib.request import OpenerDirector
 
 import bs4
 import chardet
-import winsound
 
 # where can you get the server's list
-from vultr import ping, publicIP
+from vultr import PingThread
 from vultr.Node import Node
 
 vultrServerUrl = "https://www.vultr.com/faq/"
 # servers Node list , name and Url
 vultrServerNodes = []
 # vultr test score
-vultrserversScore = {}
+vultrServersScore = {}
 
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb18030')
 
@@ -75,7 +74,7 @@ def getServerNodeListSoup(useLocalCache=False):
     return soup
 
 
-soup = getServerNodeListSoup()
+soup = getServerNodeListSoup(True)
 # each <tr> row meaing one server
 tr_servers = soup.select("#speedtest_v4 tr")
 # get the server node info form <tr>
@@ -93,10 +92,12 @@ for one_tr in tr_servers:
         print(e)
         pass
 
-#for oneServerNode in vultrServerNodes:
-    #print(oneServerNode, end='')
-    #print(ping(oneServerNode.url, 1))
+ping_threads = [PingThread(oneServerNode,50) for oneServerNode in vultrServerNodes]
+for _ in ping_threads: _.start()
+for _ in ping_threads: _.join()
+ping_result = {t.serverNode: t.result for t in ping_threads}
+for r, v in ping_result.items():
+    print("%-26s"%r.name, end='\t')
+    print(v)
 
-my_ip = publicIP()
-print(my_ip)
 winsound.MessageBeep(winsound.MB_OK)

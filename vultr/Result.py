@@ -14,6 +14,13 @@ class Result:
         self.CS_delay_max = delay_max
         self.CS_delay_avg = delay_avg
 
+    def setCSPackage(self,sent,received,lost,lost_rate):
+        self.sent = sent
+        self.received = received
+        self.lost = lost
+        self.lost_rate = lost_rate
+
+
     def setSCDelay(self, delay_min, delay_max, delay_avg):
         """
         set Server to Client Delay
@@ -24,6 +31,13 @@ class Result:
         self.SC_delay_min = delay_min
         self.SC_delay_max = delay_max
         self.SC_delay_avg = delay_avg
+
+    def setSCPackage(self,sent,received,lost,lost_rate):
+        self.sent = sent
+        self.received = received
+        self.lost = lost
+        self.lost_rate = lost_rate
+
 
     def setSpeed(self, speed_max, speed_avg):
         """
