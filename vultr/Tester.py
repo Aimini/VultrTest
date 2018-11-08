@@ -15,8 +15,10 @@ from urllib.request import OpenerDirector
 
 import bs4
 import chardet
+import winsound
 
 # where can you get the server's list
+from vultr import ping, publicIP
 from vultr.Node import Node
 
 vultrServerUrl = "https://www.vultr.com/faq/"
@@ -35,7 +37,7 @@ default_headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) '
                   'AppleWebKit/537.36 (KHTML, like Gecko) '
                   'Chrome/57.0.2987.133 Safari/537.36',
-    'Referer': 'http://www.baidu.com/',
+    'Referer': 'https://www.vultr.com/',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
     'Accept-Language': 'zh-CN,zh;q=0.8'
 }
@@ -73,17 +75,17 @@ def getServerNodeListSoup(useLocalCache=False):
     return soup
 
 
-soup = getServerNodeListSoup(True)
-# each row meaing one server
+soup = getServerNodeListSoup()
+# each <tr> row meaing one server
 tr_servers = soup.select("#speedtest_v4 tr")
+# get the server node info form <tr>
 for one_tr in tr_servers:
     tds = one_tr.find_all("td")
-    # the seconde td is server node's url
     try:
-
         name = tds[0].get_text().strip()
         address = ""
         if tds[1].a is not None:
+            # the seconde <td> is server node's url
             address = tds[1].a['href']
             vultrServerNodes.append(Node(name, address))
     except TypeError as e:
@@ -91,7 +93,10 @@ for one_tr in tr_servers:
         print(e)
         pass
 
-print("server numbers:"+str(len(vultrServerNodes)))
-print(vultrServerNodes)
+#for oneServerNode in vultrServerNodes:
+    #print(oneServerNode, end='')
+    #print(ping(oneServerNode.url, 1))
 
-
+my_ip = publicIP()
+print(my_ip)
+winsound.MessageBeep(winsound.MB_OK)

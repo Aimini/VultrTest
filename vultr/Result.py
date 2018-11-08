@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# time: 2018-11-06 19:46:13
+# Author: AI
+
 class Result:
     def setCSDelay(self, delay_min, delay_max, delay_avg):
         """
