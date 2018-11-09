@@ -55,7 +55,10 @@ def vultr_server_ping(server_url, target, count=4):
 
         PLP = re.search(r"(\S+) packets transmitted, (\S+) received, (\S+)% packet loss, time (\S+)ms", text)
         DELAY = re.search(r"rtt min/avg/max/mdev = (\S+)/(\S+)/(\S+)/(\S+)", text)
-
+        if PLP is None or DELAY is None:
+            print(text)
+            return {"package": [-1, -1, -1, -1],
+                    "delay": [-1, -1, -1]}
         sent += int(PLP.group(1))
         received += int(PLP.group(2))
 
@@ -65,7 +68,7 @@ def vultr_server_ping(server_url, target, count=4):
 
     delay_avg /= count
     loss = sent - received
-    loss_rate = int(100*loss / sent)
+    loss_rate = int(100 * loss / sent)
 
-    return {"package": [sent, received, loss, round(loss_rate,2)],
-            "delay": [delay_max, delay_min, round(delay_avg,2)]}
+    return {"package": [sent, received, loss, round(loss_rate, 2)],
+            "delay": [delay_max, delay_min, round(delay_avg, 2)]}

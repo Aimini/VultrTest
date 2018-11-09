@@ -45,9 +45,9 @@ def ping(host: str, count: int = 4):
         else:
             node_data["delay"] = [-1, -1, -1]
             # covert result(string) to number
-            for v in node_data.values():
-                for i in range(len(v)):
-                    v[i] = int(v[i])
+        for v in node_data.values():
+            for i in range(len(v)):
+                v[i] = int(v[i])
 
         return node_data
 

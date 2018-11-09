@@ -85,6 +85,7 @@ def put_ping_threads_result_to_map(result_map, ts):
         if (result_map[t.serverNode]) is None:
             result_map[t.serverNode] = Node()
 
+        print("{:<30} {:0>3}%, {:<6.2f}ms".format(t.serverNode.name, t.result['package'][3], t.result['delay'][2]))
         if type(t) is ServerPingThread:
             result_map[t.serverNode].sc = t.result
         if type(t) is PingThread:
@@ -145,7 +146,7 @@ def servers_download(server_nodes, result_map, useGB=True):
         else:
             url = server.get100MBDownloadLink()
         savg, smax, seconds = download_speed(url)
-        print("{}:MB/s".format(server.name,savg))
+        print("{}:{}MB/s".format(server.name,savg))
         result_map[server].speed = [round(smax, 2), round(savg, 2)]
 
 
