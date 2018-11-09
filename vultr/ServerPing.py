@@ -65,7 +65,7 @@ def vultr_server_ping(server_url, target, count=4):
 
     delay_avg /= count
     loss = sent - received
-    loss_rate = loss / sent
+    loss_rate = int(100*loss / sent)
 
     return {"package": [sent, received, loss, round(loss_rate,2)],
             "delay": [delay_max, delay_min, round(delay_avg,2)]}
